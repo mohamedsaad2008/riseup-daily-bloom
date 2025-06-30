@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,6 +10,11 @@ import AdminPage from "./pages/AdminPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
+import HabitsPage from "./pages/HabitsPage";
+import StudyTimerPage from "./pages/StudyTimerPage";
+import WaterTrackerPage from "./pages/WaterTrackerPage";
+import MealTrackerPage from "./pages/MealTrackerPage";
+import SchedulePage from "./pages/SchedulePage";
 
 const queryClient = new QueryClient();
 
@@ -27,12 +31,11 @@ const App = () => (
             <Route path="admin" element={<AdminPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="settings" element={<SettingsPage />} />
-            {/* Placeholder routes for other pages */}
-            <Route path="habits" element={<DashboardPage />} />
-            <Route path="study" element={<DashboardPage />} />
-            <Route path="water" element={<DashboardPage />} />
-            <Route path="meals" element={<DashboardPage />} />
-            <Route path="schedule" element={<DashboardPage />} />
+            <Route path="habits" element={<HabitsPage />} />
+            <Route path="study" element={<StudyTimerPage />} />
+            <Route path="water" element={<WaterTrackerPage />} />
+            <Route path="meals" element={<MealTrackerPage />} />
+            <Route path="schedule" element={<SchedulePage />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
