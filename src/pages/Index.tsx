@@ -1,15 +1,10 @@
 
 import React from 'react';
-import Dashboard from '@/components/Dashboard';
-import { Toaster } from '@/components/ui/toaster';
+import { Navigate } from 'react-router-dom';
 
 const Index = () => {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-100 via-amber-50 to-blue-100">
-      <Dashboard />
-      <Toaster />
-    </div>
-  );
+  // Redirect to dashboard since we now have a proper layout
+  return <Navigate to="/" replace />;
 };
 
 export default Index;
