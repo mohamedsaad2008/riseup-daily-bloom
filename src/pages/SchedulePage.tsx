@@ -38,7 +38,7 @@ const SchedulePage = () => {
   });
 
   const getDaySchedule = () => {
-    const dayName = selectedDate.toLocaleDateString('en-US', { weekday: 'lowercase' });
+    const dayName = selectedDate.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
     return weeklySchedule[dayName as keyof typeof weeklySchedule] || [];
   };
 
