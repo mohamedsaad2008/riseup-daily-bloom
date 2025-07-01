@@ -1,27 +1,80 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { weightService } from '@/services/api';
+import { useToast } from '@/hooks/use-toast';
 
 const WeightTracker = () => {
   const [currentWeight, setCurrentWeight] = useState(40);
   const [weightInput, setWeightInput] = useState('');
-  const [weightHistory] = useState([
+  const [weightHistory, setWeightHistory] = useState([
     { date: '2024-01-01', weight: 40 },
     { date: '2024-01-15', weight: 40.5 },
     { date: '2024-02-01', weight: 41 },
     { date: '2024-02-15', weight: 41.8 },
   ]);
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   const goalWeight = 55;
   const progressPercentage = ((currentWeight - 40) / (goalWeight - 40)) * 100;
 
-  const addWeight = () => {
+  // Fetch weight history on component mount
+  useEffect(() => {
+    const fetchWeightHistory = async () => {
+      try {
+        setLoading(true);
+        const history = await weightService.getWeightHistory();
+        if (history && history.length > 0) {
+          setWeightHistory(history);
+          // Set current weight to the most recent entry
+          setCurrentWeight(history[0].weight);
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching weight history:', error);
+        setLoading(false);
+      }
+    };
+    
+    fetchWeightHistory();
+  }, []);
+
+  const addWeight = async () => {
     const weight = parseFloat(weightInput);
     if (weight && weight > 0) {
-      setCurrentWeight(weight);
-      setWeightInput('');
+      try {
+        setLoading(true);
+        
+        // Add weight entry to the backend
+        await weightService.addWeightEntry(weight, goalWeight);
+        
+        // Update local state
+        setCurrentWeight(weight);
+        setWeightInput('');
+        
+        // Add to history
+        const today = new Date().toISOString().split('T')[0];
+        const newHistory = [{ date: today, weight }, ...weightHistory];
+        setWeightHistory(newHistory);
+        
+        toast({
+          title: "⚖️ Weight Updated",
+          description: `Your weight has been updated to ${weight} kg`,
+          duration: 3000,
+        });
+        
+        setLoading(false);
+      } catch (error) {
+        console.error('Error updating weight:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update weight. Please try again.",
+          variant: "destructive"
+        });
+        setLoading(false);
+      }
     }
   };
 
@@ -67,10 +120,12 @@ const WeightTracker = () => {
               value={weightInput}
               onChange={(e) => setWeightInput(e.target.value)}
               className="flex-1"
+              disabled={loading}
             />
             <Button 
               onClick={addWeight}
               className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600"
+              disabled={loading || !weightInput}
             >
               Update
             </Button>

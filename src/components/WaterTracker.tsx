@@ -1,7 +1,8 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { waterService } from '@/services/api';
+import { useToast } from '@/hooks/use-toast';
 
 interface WaterTrackerProps {
   current: number;
@@ -10,15 +11,62 @@ interface WaterTrackerProps {
 
 const WaterTracker: React.FC<WaterTrackerProps> = ({ current, onWaterAdd }) => {
   const goal = 8;
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
-  const addWater = () => {
+  const addWater = async () => {
     if (current < goal) {
-      onWaterAdd(current + 1);
+      try {
+        setLoading(true);
+        const newCount = current + 1;
+        
+        // Update in the backend
+        await waterService.updateWaterIntake(newCount);
+        
+        // Update in the UI
+        onWaterAdd(newCount);
+        
+        if (newCount === goal) {
+          toast({
+            title: "💧 Hydration Goal Achieved!",
+            description: "Great job staying hydrated today!",
+            duration: 3000,
+          });
+        }
+        
+        setLoading(false);
+      } catch (error) {
+        console.error('Error updating water intake:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update water intake. Please try again.",
+          variant: "destructive"
+        });
+        setLoading(false);
+      }
     }
   };
 
-  const resetWater = () => {
-    onWaterAdd(0);
+  const resetWater = async () => {
+    try {
+      setLoading(true);
+      
+      // Reset in the backend
+      await waterService.updateWaterIntake(0);
+      
+      // Reset in the UI
+      onWaterAdd(0);
+      
+      setLoading(false);
+    } catch (error) {
+      console.error('Error resetting water intake:', error);
+      toast({
+        title: "Error",
+        description: "Failed to reset water intake. Please try again.",
+        variant: "destructive"
+      });
+      setLoading(false);
+    }
   };
 
   return (
@@ -60,7 +108,7 @@ const WaterTracker: React.FC<WaterTrackerProps> = ({ current, onWaterAdd }) => {
           <div className="flex gap-2">
             <Button 
               onClick={addWater}
-              disabled={current >= goal}
+              disabled={current >= goal || loading}
               className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 disabled:opacity-50"
             >
               + Add Glass
@@ -69,6 +117,7 @@ const WaterTracker: React.FC<WaterTrackerProps> = ({ current, onWaterAdd }) => {
               onClick={resetWater}
               variant="outline"
               size="sm"
+              disabled={loading}
             >
               Reset
             </Button>

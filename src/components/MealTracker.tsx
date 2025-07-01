@@ -1,7 +1,8 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { mealService } from '@/services/api';
+import { useToast } from '@/hooks/use-toast';
 
 interface MealTrackerProps {
   current: number;
@@ -10,16 +11,71 @@ interface MealTrackerProps {
 
 const MealTracker: React.FC<MealTrackerProps> = ({ current, onMealAdd }) => {
   const goal = 4;
-  const meals = ['🥐 Breakfast', '🍽️ Lunch', '🥪 Snack', '🍛 Dinner'];
+  const meals = [
+    { name: '🥐 Breakfast', key: 'breakfast' },
+    { name: '🍽️ Lunch', key: 'lunch' },
+    { name: '🥪 Snack', key: 'snack' },
+    { name: '🍛 Dinner', key: 'dinner' }
+  ];
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
-  const addMeal = () => {
+  const addMeal = async () => {
     if (current < goal) {
-      onMealAdd(current + 1);
+      try {
+        setLoading(true);
+        const newCount = current + 1;
+        const meal = meals[current];
+        
+        // Update in the backend
+        await mealService.updateMeal(meal.key, true);
+        
+        // Update in the UI
+        onMealAdd(newCount);
+        
+        if (newCount === goal) {
+          toast({
+            title: "🍽️ All Meals Completed!",
+            description: "Great job with your nutrition today!",
+            duration: 3000,
+          });
+        }
+        
+        setLoading(false);
+      } catch (error) {
+        console.error('Error updating meal:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update meal. Please try again.",
+          variant: "destructive"
+        });
+        setLoading(false);
+      }
     }
   };
 
-  const resetMeals = () => {
-    onMealAdd(0);
+  const resetMeals = async () => {
+    try {
+      setLoading(true);
+      
+      // Reset all meals in the backend
+      for (const meal of meals) {
+        await mealService.updateMeal(meal.key, false);
+      }
+      
+      // Reset in the UI
+      onMealAdd(0);
+      
+      setLoading(false);
+    } catch (error) {
+      console.error('Error resetting meals:', error);
+      toast({
+        title: "Error",
+        description: "Failed to reset meals. Please try again.",
+        variant: "destructive"
+      });
+      setLoading(false);
+    }
   };
 
   return (
@@ -42,7 +98,7 @@ const MealTracker: React.FC<MealTrackerProps> = ({ current, onMealAdd }) => {
                     : 'bg-gray-50'
                 }`}
               >
-                <span className="font-medium">{meal}</span>
+                <span className="font-medium">{meal.name}</span>
                 <div className={`w-6 h-6 rounded-full flex items-center justify-center text-white text-sm ${
                   index < current ? 'bg-gradient-to-r from-orange-500 to-red-500' : 'bg-gray-300'
                 }`}>
@@ -66,7 +122,7 @@ const MealTracker: React.FC<MealTrackerProps> = ({ current, onMealAdd }) => {
           <div className="flex gap-2">
             <Button 
               onClick={addMeal}
-              disabled={current >= goal}
+              disabled={current >= goal || loading}
               className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 disabled:opacity-50"
             >
               + Add Meal
@@ -75,6 +131,7 @@ const MealTracker: React.FC<MealTrackerProps> = ({ current, onMealAdd }) => {
               onClick={resetMeals}
               variant="outline"
               size="sm"
+              disabled={loading}
             >
               Reset
             </Button>

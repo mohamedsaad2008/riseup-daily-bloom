@@ -1,73 +1,118 @@
-# Welcome to your Lovable project
+# RiseUp Daily Bloom
 
-## Project info
+A daily habit tracking application for personal growth and productivity.
 
-**URL**: https://lovable.dev/projects/2642b896-da0c-43f7-a5d0-2dbc2399307f
+## Features
 
-## How can I edit this code?
+- Track daily habits like study time, workouts, prayers, water intake, and meals
+- Monitor weight progress
+- Maintain streaks for consistent habit building
+- Pomodoro study timer
+- User authentication
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+- Frontend: React, TypeScript, Tailwind CSS, Shadcn UI
+- Backend: Node.js, Express
+- Database: SQLite
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/2642b896-da0c-43f7-a5d0-2dbc2399307f) and start prompting.
+## Getting Started
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prerequisites
 
-**Use your preferred IDE**
+- Node.js (v14 or higher)
+- npm or bun
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Installation
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+1. Clone the repository
+   ```bash
+   git clone https://github.com/yourusername/riseup-daily-bloom.git
+   cd riseup-daily-bloom
+   ```
 
-Follow these steps:
+2. Install dependencies
+   ```bash
+   npm install
+   # or
+   bun install
+   ```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+3. Create environment files
+   - Create `.env.local` in the root directory with:
+     ```
+     VITE_API_URL=http://localhost:3001/api
+     ```
+   - Create `.env` in the root directory with:
+     ```
+     PORT=3001
+     JWT_SECRET=your-secret-key
+     NODE_ENV=development
+     ```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Running the Application
 
-# Step 3: Install the necessary dependencies.
-npm i
+1. Start the backend server
+   ```bash
+   npm run server
+   # or
+   bun run server
+   ```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+2. In a separate terminal, start the frontend development server
+   ```bash
+   npm run dev
+   # or
+   bun run dev
+   ```
 
-**Edit a file directly in GitHub**
+3. Open your browser and navigate to `http://localhost:5173`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Database Structure
 
-**Use GitHub Codespaces**
+The application uses SQLite for data storage with the following tables:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- `users`: User account information
+- `habits`: Habit definitions (study, workout, prayers, water, meals)
+- `habit_entries`: Daily tracking of habit progress
+- `prayers`: Daily prayer tracking
+- `water_intake`: Daily water intake tracking
+- `meals`: Daily meal tracking
+- `weight_entries`: Weight tracking over time
+- `study_sessions`: Study session records
+- `workout_sessions`: Workout session records
+- `streaks`: User streak tracking
 
-## What technologies are used for this project?
+## API Endpoints
 
-This project is built with:
+### Authentication
+- `POST /api/register`: Register a new user
+- `POST /api/login`: Login a user
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Dashboard
+- `GET /api/dashboard`: Get dashboard data for the current user
 
-## How can I deploy this project?
+### Habits
+- `POST /api/habits/:habitId`: Update a habit entry
 
-Simply open [Lovable](https://lovable.dev/projects/2642b896-da0c-43f7-a5d0-2dbc2399307f) and click on Share -> Publish.
+### Prayers
+- `POST /api/prayers`: Update prayer status
 
-## Can I connect a custom domain to my Lovable project?
+### Water
+- `POST /api/water`: Update water intake
 
-Yes, you can!
+### Meals
+- `POST /api/meals`: Update meal status
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### Weight
+- `POST /api/weight`: Add weight entry
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+### Study
+- `POST /api/study`: Add study session
+
+### Workout
+- `POST /api/workout`: Add workout session
+
+## License
+
+MIT

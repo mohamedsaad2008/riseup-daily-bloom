@@ -1,7 +1,8 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { prayerService } from '@/services/api';
+import { useToast } from '@/hooks/use-toast';
 
 interface PrayerTrackerProps {
   onPrayerComplete: (count: number) => void;
@@ -9,22 +10,55 @@ interface PrayerTrackerProps {
 
 const PrayerTracker: React.FC<PrayerTrackerProps> = ({ onPrayerComplete }) => {
   const [completedPrayers, setCompletedPrayers] = useState<boolean[]>([false, false, false, false, false]);
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
   
   const prayers = [
-    { name: 'Fajr', time: '5:45 AM', emoji: '🌅' },
-    { name: 'Dhuhr', time: '1:20 PM', emoji: '☀️' },
-    { name: 'Asr', time: '4:30 PM', emoji: '🌤️' },
-    { name: 'Maghrib', time: '7:15 PM', emoji: '🌅' },
-    { name: 'Isha', time: '8:45 PM', emoji: '🌙' },
+    { name: 'Fajr', time: '5:45 AM', emoji: '🌅', key: 'fajr' },
+    { name: 'Dhuhr', time: '1:20 PM', emoji: '☀️', key: 'dhuhr' },
+    { name: 'Asr', time: '4:30 PM', emoji: '🌤️', key: 'asr' },
+    { name: 'Maghrib', time: '7:15 PM', emoji: '🌅', key: 'maghrib' },
+    { name: 'Isha', time: '8:45 PM', emoji: '🌙', key: 'isha' },
   ];
 
-  const togglePrayer = (index: number) => {
-    const newCompleted = [...completedPrayers];
-    newCompleted[index] = !newCompleted[index];
-    setCompletedPrayers(newCompleted);
-    
-    const count = newCompleted.filter(Boolean).length;
-    onPrayerComplete(count);
+  const togglePrayer = async (index: number) => {
+    try {
+      setLoading(true);
+      const newCompleted = [...completedPrayers];
+      newCompleted[index] = !newCompleted[index];
+      
+      // Update the prayer status in the backend
+      await prayerService.updatePrayer(
+        prayers[index].key, 
+        newCompleted[index]
+      );
+      
+      // Update local state
+      setCompletedPrayers(newCompleted);
+      
+      // Count completed prayers
+      const count = newCompleted.filter(Boolean).length;
+      onPrayerComplete(count);
+      
+      // Show toast for completed prayer
+      if (newCompleted[index]) {
+        toast({
+          title: `${prayers[index].emoji} ${prayers[index].name} Prayer`,
+          description: "Prayer marked as completed",
+          duration: 2000,
+        });
+      }
+      
+      setLoading(false);
+    } catch (error) {
+      console.error('Error updating prayer status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update prayer status. Please try again.",
+        variant: "destructive"
+      });
+      setLoading(false);
+    }
   };
 
   return (
@@ -57,6 +91,7 @@ const PrayerTracker: React.FC<PrayerTrackerProps> = ({ onPrayerComplete }) => {
                 variant={completedPrayers[index] ? "default" : "outline"}
                 size="sm"
                 className={completedPrayers[index] ? "bg-gradient-to-r from-purple-500 to-violet-600" : ""}
+                disabled={loading}
               >
                 {completedPrayers[index] ? '✓' : '○'}
               </Button>
