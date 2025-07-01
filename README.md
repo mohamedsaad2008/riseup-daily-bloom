@@ -38,19 +38,31 @@ A daily habit tracking application for personal growth and productivity.
    bun install
    ```
 
-3. Create environment files
-   - Create `.env.local` in the root directory with:
-     ```
-     VITE_API_URL=http://localhost:3001/api
-     ```
-   - Create `.env` in the root directory with:
-     ```
-     PORT=3001
-     JWT_SECRET=your-secret-key
-     NODE_ENV=development
-     ```
+3. Initialize the database and seed with sample data
+   ```bash
+   npm run seed
+   # or
+   bun run seed
+   ```
 
 ### Running the Application
+
+1. Start both the frontend and backend servers with a single command:
+   ```bash
+   npm run start
+   # or
+   bun run start
+   ```
+
+2. Open your browser and navigate to `http://localhost:8080`
+
+3. Login with the test account:
+   - Username: testuser
+   - Password: password123
+
+### Running Separately
+
+If you prefer to run the frontend and backend separately:
 
 1. Start the backend server
    ```bash
@@ -66,22 +78,18 @@ A daily habit tracking application for personal growth and productivity.
    bun run dev
    ```
 
-3. Open your browser and navigate to `http://localhost:5173`
+## Database Management
 
-## Database Structure
+The application uses SQLite for data storage. Here are some useful commands:
 
-The application uses SQLite for data storage with the following tables:
-
-- `users`: User account information
-- `habits`: Habit definitions (study, workout, prayers, water, meals)
-- `habit_entries`: Daily tracking of habit progress
-- `prayers`: Daily prayer tracking
-- `water_intake`: Daily water intake tracking
-- `meals`: Daily meal tracking
-- `weight_entries`: Weight tracking over time
-- `study_sessions`: Study session records
-- `workout_sessions`: Workout session records
-- `streaks`: User streak tracking
+- Reset the database: `npm run db:reset`
+- Backup the database: `npm run db:backup`
+- Restore from backup: `npm run db:restore <filename>`
+- List backups: `npm run db:list`
+- Show database statistics: `npm run db:stats`
+- Run migrations: `npm run migrate`
+- Rollback migrations: `npm run migrate:rollback`
+- Create a new migration: `npm run migrate:create <name>`
 
 ## API Endpoints
 

@@ -19,7 +19,8 @@
     "db:stats": "node backend/db-utils.js stats",
     "migrate": "node backend/migrations/index.js run",
     "migrate:rollback": "node backend/migrations/index.js rollback",
-    "migrate:create": "node backend/migrations/index.js create"
+    "migrate:create": "node backend/migrations/index.js create",
+    "start": "./start-dev.sh"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
